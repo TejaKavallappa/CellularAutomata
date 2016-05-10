@@ -1,0 +1,28 @@
+html, body, h1, h2, p, strong, em, a, div,
+span, h3, h4, img, footer, header, nav,
+ul, li, label, input, button {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  outline: 0;
+  box-sizing: inherit;
+  font: inherit;
+  text-decoration: inherit;
+  text-align: inherit;
+  color: inherit;
+  background: transparent;
+}
+
+#game-canvas{
+  margin-left: 150px;
+  margin-top: 100px;
+}
+header{
+  display: flex;
+  justify-content: center;
+}
+header h1{
+
+  font-size: 32px;
+  font-family: sans-serif;
+}
