@@ -2,9 +2,10 @@ var GameView = function (game, ctx, canvasEl) {
   this.canvas = canvasEl;
   this.ctx = ctx;
   this.game = game;
-  this.cellSize = 40;
+  this.cellSize = 20;
   this.horCells = GameView.DIM_X/ this.cellSize;
   this.verCells = GameView.DIM_Y/ this.cellSize;
+  this.bindListener();
 };
 
 GameView.DIM_X = 520;
@@ -21,7 +22,9 @@ GameView.prototype.handleClick = function(e){
   var xCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
   //Distance from top of canvas
   var yCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
-  console.log(xCellNum, yCellNum);
+  var cellCoord = [xCellNum* this.cellSize, yCellNum * this.cellSize];
+
+  this.game.draw(this.ctx, cellCoord ,this.cellSize);
 };
 
 GameView.prototype.draw = function(){

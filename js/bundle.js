@@ -55,9 +55,9 @@
 	  var ctx = canvasEl.getContext("2d");
 	  var game = new Game();
 	  // new GameView(game, ctx).start();
-	  var gv = new GameView(game,ctx, canvasEl);
+	  var gv = new GameView(game, ctx, canvasEl);
 	  gv.start();
-	  
+	
 	});
 
 
@@ -69,25 +69,40 @@
 	
 	var Game = function(){
 	  this.board = new Board();
+	  this.colony = [];
 	};
 	
+	Game.prototype.draw = function(ctx, cellCoord, cellSize){
+	  // Temporary function to fill a particular cell with color
+	  ctx.fillStyle = "green";
+	  ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
+	  this.colony.push(cellCoord);
+	  console.log(this.colony);
+	};
 	Game.prototype.isOver = function(){
 	  return this.board.isOver();//When no colonies remain alive
 	};
 	
+	
 	Game.prototype.run = function(){};
 	Game.prototype.pause = function(){};
 	Game.prototype.step = function(){};
-	Game.prototype.draw = function(){};
 	
 	module.exports = Game;
+	window.Game = Game;
 
 
 /***/ },
 /* 2 */
 /***/ function(module, exports) {
 
-	var Board = function(){};
+	var Board = function(){
+	  this.grid = [];
+	};
+	
+	Board.prototype.populate = function(){
+	  
+	};
 	module.exports = Board;
 
 
@@ -99,9 +114,10 @@
 	  this.canvas = canvasEl;
 	  this.ctx = ctx;
 	  this.game = game;
-	  this.cellSize = 40;
+	  this.cellSize = 20;
 	  this.horCells = GameView.DIM_X/ this.cellSize;
 	  this.verCells = GameView.DIM_Y/ this.cellSize;
+	  this.bindListener();
 	};
 	
 	GameView.DIM_X = 520;
@@ -118,7 +134,9 @@
 	  var xCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
 	  //Distance from top of canvas
 	  var yCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
-	  console.log(xCellNum, yCellNum);
+	  var cellCoord = [xCellNum* this.cellSize, yCellNum * this.cellSize];
+	
+	  this.game.draw(this.ctx, cellCoord ,this.cellSize);
 	};
 	
 	GameView.prototype.draw = function(){
