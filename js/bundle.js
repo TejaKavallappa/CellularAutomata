@@ -54,7 +54,10 @@
 	
 	  var ctx = canvasEl.getContext("2d");
 	  var game = new Game();
-	  new GameView(game, ctx).start();
+	  // new GameView(game, ctx).start();
+	  var gv = new GameView(game,ctx, canvasEl);
+	  gv.start();
+	  
 	});
 
 
@@ -92,13 +95,31 @@
 /* 3 */
 /***/ function(module, exports) {
 
-	var GameView = function (game, ctx) {
+	var GameView = function (game, ctx, canvasEl) {
+	  this.canvas = canvasEl;
 	  this.ctx = ctx;
 	  this.game = game;
+	  this.cellSize = 40;
+	  this.horCells = GameView.DIM_X/ this.cellSize;
+	  this.verCells = GameView.DIM_Y/ this.cellSize;
 	};
 	
-	GameView.DIM_X = 500;
-	GameView.DIM_Y = 500;
+	GameView.DIM_X = 520;
+	GameView.DIM_Y = 520;
+	
+	GameView.prototype.bindListener = function(){
+	  this.canvas.addEventListener('click', this.handleClick.bind(this));
+	};
+	
+	GameView.prototype.handleClick = function(e){
+	  // Get the canvas coordinates
+	  var canvasDim = this.canvas.getBoundingClientRect();
+	  //Distance from left of canvas
+	  var xCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
+	  //Distance from top of canvas
+	  var yCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
+	  console.log(xCellNum, yCellNum);
+	};
 	
 	GameView.prototype.draw = function(){
 	  this.ctx.clearRect(0, 0, GameView.DIM_X, GameView.DIM_Y);
@@ -106,45 +127,44 @@
 	  this.ctx.fillRect(0, 0, GameView.DIM_X, GameView.DIM_Y);
 	};
 	
-	GameView.prototype.drawGridLines = function() {
+	GameView.prototype.drawGridLines = function(lineOptions) {
 	  // Draw the grid
 	  //padding around grid
-	  var p = 10;
-	  var bw = GameView.DIM_X - 2*p;
-	  var bh = GameView.DIM_Y - 2*p;
+	  var bw = GameView.DIM_X;
+	  var bh = GameView.DIM_Y;
 	  //size of canvas
-	  var cw = bw + (p*2) + 1;
-	  var ch = bh + (p*2) + 1;
+	  var cw = bw + 1;
+	  var ch = bh + 1;
 	
 	  // Vertical lines
 	  this.ctx.strokeStyle = "black";
 	  this.ctx.lineWidth = 1.3;
-	  for (var x = 0; x <= bw; x += 40) {
-	      this.ctx.moveTo(0.5 + x + p, p);
-	      this.ctx.lineTo(0.5 + x + p, bh + p);
+	  for (var x = 0; x <= bw; x += this.cellSize) {
+	      this.ctx.moveTo(x, 0);
+	      this.ctx.lineTo(x, bh);
 	      this.ctx.stroke();
 	  }
 	 // Horizontal lines
-	  for (x = 0; x <= bh; x += 40) {
-	      this.ctx.moveTo(p, 0.5 + x + p);
-	      this.ctx.lineTo(bw + p, 0.5 + x + p);
+	  for (x = 0; x <= bh; x += this.cellSize) {
+	      this.ctx.moveTo(0, x);
+	      this.ctx.lineTo(bw, x);
 	      this.ctx.stroke();
 	  }
-	    return;
-	      };
+	  return;
+	};
 	
 	
 	GameView.prototype.start = function () {
 	  this.lastTime = 0;
 	  this.draw();
-	  this.drawGridLines();
+	  this.drawGridLines({lineSpacing: 40});
 	  //start the animation
 	  // requestAnimationFrame(this.animate.bind(this));
 	};
 	
 	GameView.prototype.animate = function(time){
 	  var timeDelta = time - this.lastTime;
-	  this.drawGridLines({color: "red", separation: 30});
+	  this.drawGridLines({color: "red"});
 	
 	  // this.game.step(timeDelta);
 	  // this.game.draw(this.ctx);
