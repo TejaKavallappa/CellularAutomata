@@ -3,6 +3,7 @@ var Board = function(numCells, ctx, cellSize){
   this.numCells = numCells;
   this.ctx = ctx;
   this.cellSize = cellSize;
+  this.status = 'running';
   this.grid = this.populate();
 };
 
@@ -27,7 +28,17 @@ Board.prototype.buildColony = function(x, y){
 
 Board.NEIGHBORS = [[0,-1],[0,1],[1,0],[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]];
 
+Board.prototype.isOver = function(){
+  console.log("Game over");
+};
+
+Board.prototype.reset = function(){
+  this.status = 'paused';
+  this.grid = [];
+};
+
 Board.prototype.step = function(){
+  var numAliveCells = 0;
   var newGrid = this.populate();
   for(var i = 0; i < this.numCells; i++){
     for(var j = 0; j < this.numCells; j++){
@@ -37,23 +48,35 @@ Board.prototype.step = function(){
         var delta = Board.NEIGHBORS[k];
         var gridVal = this.grid[i+delta[0]] ? this.grid[i+delta[0]][j+delta[1]] || 0 : 0;
         aliveNeighbors += gridVal;
-        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1;
-        if (this.grid[i][j] === 1 && (aliveNeighbors > 4 || aliveNeighbors < 1)){
-          newGrid[i][j] = null;
+      }
+        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1
+        // else it lives;
+        if (this.grid[i][j] === 1){
+          if (aliveNeighbors > 4 || aliveNeighbors < 1){
+            newGrid[i][j] = null;
+          }
+          else{
+            newGrid[i][j] = this.grid[i][j];
+            numAliveCells += 1;
+          }
         }
         // If cell is dead and it has aliveNeighbors == 3, it becomes alive
         else if (!this.grid[i][j] && aliveNeighbors === 3){
           newGrid[i][j] = 1;
+          numAliveCells += 1;
         }
         else{
           newGrid[i][j] = this.grid[i][j];
+          numAliveCells += this.grid[i][j];
          }
-      }
-    }
-  }
+    }//for j
+  }//for i
   this.grid = newGrid;
+  if(!numAliveCells){
+    return this.game.isOver();
+  }
   this.draw();
-};
+};//step
 
 Board.prototype.draw = function(){
   var sz = this.cellSize;

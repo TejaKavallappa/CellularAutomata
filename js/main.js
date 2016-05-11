@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function(){
   var cellSize = 20;
   var ctx = canvasEl.getContext("2d");
   var game = new Game(ctx, cellSize);
-  var menu = new MenuBar(game);
   var gv = new GameView(game, ctx, canvasEl, cellSize);
+  var menu = new MenuBar(game, gv);
   gv.start();
 });

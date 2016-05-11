@@ -58,25 +58,10 @@ GameView.prototype.drawGridLines = function() {
   return;
 };
 
-
 GameView.prototype.start = function () {
-  // this.lastTime = 0;
   this.draw();
   this.drawGridLines();
-  //start the animation
-  // requestAnimationFrame(this.animate.bind(this));
 };
-
-// GameView.prototype.animate = function(time){
-//   var timeDelta = time - this.lastTime;
-//   this.drawGridLines({color: "red"});
-//
-//   // this.game.step(timeDelta);
-//   // this.game.draw(this.ctx);
-//   this.lastTime = time;
-//
-//   requestAnimationFrame(this.animate.bind(this));
-// };
 
 module.exports = GameView;
 window.GameView = GameView;

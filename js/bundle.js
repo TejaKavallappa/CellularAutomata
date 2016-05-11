@@ -56,8 +56,8 @@
 	  var cellSize = 20;
 	  var ctx = canvasEl.getContext("2d");
 	  var game = new Game(ctx, cellSize);
-	  var menu = new MenuBar(game);
 	  var gv = new GameView(game, ctx, canvasEl, cellSize);
+	  var menu = new MenuBar(game, gv);
 	  gv.start();
 	});
 
@@ -87,12 +87,17 @@
 	  return this.board.isOver();//When no colonies remain alive
 	};
 	
+	Game.prototype.reset = function(){
+	  this.board.status = "paused";
+	  this.board.reset();
+	};
 	Game.prototype.run = function(){};
 	Game.prototype.pause = function(){};
 	
 	Game.prototype.step = function(){
-	  console.log("In game step");
-	  this.board.step();
+	  if (this.board.status === 'running'){
+	    this.board.step();
+	  }
 	};
 	
 	module.exports = Game;
@@ -108,6 +113,7 @@
 	  this.numCells = numCells;
 	  this.ctx = ctx;
 	  this.cellSize = cellSize;
+	  this.status = 'running';
 	  this.grid = this.populate();
 	};
 	
@@ -132,7 +138,17 @@
 	
 	Board.NEIGHBORS = [[0,-1],[0,1],[1,0],[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]];
 	
+	Board.prototype.isOver = function(){
+	  console.log("Game over");
+	};
+	
+	Board.prototype.reset = function(){
+	  this.status = 'paused';
+	  this.grid = [];
+	};
+	
 	Board.prototype.step = function(){
+	  var numAliveCells = 0;
 	  var newGrid = this.populate();
 	  for(var i = 0; i < this.numCells; i++){
 	    for(var j = 0; j < this.numCells; j++){
@@ -142,23 +158,35 @@
 	        var delta = Board.NEIGHBORS[k];
 	        var gridVal = this.grid[i+delta[0]] ? this.grid[i+delta[0]][j+delta[1]] || 0 : 0;
 	        aliveNeighbors += gridVal;
-	        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1;
-	        if (this.grid[i][j] === 1 && (aliveNeighbors > 4 || aliveNeighbors < 1)){
-	          newGrid[i][j] = null;
+	      }
+	        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1
+	        // else it lives;
+	        if (this.grid[i][j] === 1){
+	          if (aliveNeighbors > 4 || aliveNeighbors < 1){
+	            newGrid[i][j] = null;
+	          }
+	          else{
+	            newGrid[i][j] = this.grid[i][j];
+	            numAliveCells += 1;
+	          }
 	        }
 	        // If cell is dead and it has aliveNeighbors == 3, it becomes alive
 	        else if (!this.grid[i][j] && aliveNeighbors === 3){
 	          newGrid[i][j] = 1;
+	          numAliveCells += 1;
 	        }
 	        else{
 	          newGrid[i][j] = this.grid[i][j];
+	          numAliveCells += this.grid[i][j];
 	         }
-	      }
-	    }
-	  }
+	    }//for j
+	  }//for i
 	  this.grid = newGrid;
+	  if(!numAliveCells){
+	    return this.game.isOver();
+	  }
 	  this.draw();
-	};
+	};//step
 	
 	Board.prototype.draw = function(){
 	  var sz = this.cellSize;
@@ -271,25 +299,10 @@
 	  return;
 	};
 	
-	
 	GameView.prototype.start = function () {
-	  // this.lastTime = 0;
 	  this.draw();
 	  this.drawGridLines();
-	  //start the animation
-	  // requestAnimationFrame(this.animate.bind(this));
 	};
-	
-	// GameView.prototype.animate = function(time){
-	//   var timeDelta = time - this.lastTime;
-	//   this.drawGridLines({color: "red"});
-	//
-	//   // this.game.step(timeDelta);
-	//   // this.game.draw(this.ctx);
-	//   this.lastTime = time;
-	//
-	//   requestAnimationFrame(this.animate.bind(this));
-	// };
 	
 	module.exports = GameView;
 	window.GameView = GameView;
@@ -300,24 +313,33 @@
 /***/ function(module, exports) {
 
 	
-	var MenuBar = function(game){
-	
+	var MenuBar = function(game, gv){
 	  this.game = game;
+	  this.gameView = gv;
 	  this.status = 'paused';
 	  var start = document.getElementById('start-button');
+	  var reset = document.getElementById('reset-button');
 	  start.addEventListener('click', this.start.bind(this));
+	  reset.addEventListener('click', this.reset.bind(this));
 	};
 	
 	MenuBar.prototype.start = function(){
 	  if (this.status === 'paused'){
 	    this.status = 'running';
-	    this.gameRun = setInterval(this.game.step.bind(this.game), 1000);
+	    this.gameRun = setInterval(this.game.step.bind(this.game), 500);
 	  }
 	  else if(this.status === 'running'){
 	    this.status = 'paused';
 	    clearInterval(this.gameRun);
 	  }
 	};
+	
+	MenuBar.prototype.reset = function(){
+	  this.status = 'paused';
+	  this.game.reset();
+	  this.gameView.start();
+	};
+	
 	
 	module.exports = MenuBar;
 

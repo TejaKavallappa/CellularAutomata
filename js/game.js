@@ -19,12 +19,17 @@ Game.prototype.isOver = function(){
   return this.board.isOver();//When no colonies remain alive
 };
 
+Game.prototype.reset = function(){
+  this.board.status = "paused";
+  this.board.reset();
+};
 Game.prototype.run = function(){};
 Game.prototype.pause = function(){};
 
 Game.prototype.step = function(){
-  console.log("In game step");
-  this.board.step();
+  if (this.board.status === 'running'){
+    this.board.step();
+  }
 };
 
 module.exports = Game;
