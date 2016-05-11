@@ -19,11 +19,10 @@ GameView.prototype.handleClick = function(e){
   // Get the canvas coordinates
   var canvasDim = this.canvas.getBoundingClientRect();
   //Distance from left of canvas
-  var xCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
+  var horCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
   //Distance from top of canvas
-  var yCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
-  var cellCoord = [xCellNum* this.cellSize, yCellNum * this.cellSize];
-
+  var verCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
+  var cellCoord = [horCellNum* this.cellSize, verCellNum * this.cellSize];
   this.game.drawColony(this.ctx, cellCoord ,this.cellSize);
 };
 

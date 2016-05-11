@@ -2,29 +2,38 @@
 var MenuBar = function(game, gv){
   this.game = game;
   this.gameView = gv;
-  this.status = 'paused';
-  var start = document.getElementById('start-button');
-  var reset = document.getElementById('reset-button');
-  start.addEventListener('click', this.start.bind(this));
-  reset.addEventListener('click', this.reset.bind(this));
+  this.getButtonRefs();
+  this.addButtonListeners();
+};
+MenuBar.prototype.getButtonRefs = function(){
+  this.startGOL = document.getElementById('start-button');
+  this.stopGOL = document.getElementById('stop-button');
+  this.resetGOL = document.getElementById('reset-button');
+  this.stepGOL = document.getElementById('step-button');
 };
 
-MenuBar.prototype.start = function(){
-  if (this.status === 'paused'){
-    this.status = 'running';
-    this.gameRun = setInterval(this.game.step.bind(this.game), 500);
-  }
-  else if(this.status === 'running'){
-    this.status = 'paused';
+MenuBar.prototype.addButtonListeners = function(){
+  this.startGOL.addEventListener('click', this.startGame.bind(this));
+  this.stopGOL.addEventListener('click', this.stopGame.bind(this));
+  this.resetGOL.addEventListener('click', this.resetGame.bind(this));
+  this.stepGOL.addEventListener('click', this.stepGame.bind(this));
+};
+
+MenuBar.prototype.startGame = function(){
+    this.gameRun = setInterval(this.game.step.bind(this.game), 300);
+};
+MenuBar.prototype.stopGame = function(){
+  clearInterval(this.gameRun);
+};
+
+MenuBar.prototype.resetGame = function(){
+  if (this.gameRun){
+    console.log("stoppping the asynchronous callback");
     clearInterval(this.gameRun);
   }
-};
-
-MenuBar.prototype.reset = function(){
-  this.status = 'paused';
   this.game.reset();
-  this.gameView.start();
 };
-
-
+MenuBar.prototype.stepGame = function(){
+  this.game.step();
+};
 module.exports = MenuBar;

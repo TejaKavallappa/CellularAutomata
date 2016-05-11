@@ -76,28 +76,58 @@
 	Game.DIM_X = 520;
 	Game.DIM_Y = 520;
 	
+	Game.prototype.draw = function(){
+	  this.ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
+	  this.ctx.fillStyle = 'grey';
+	  this.ctx.fillRect(0, 0, Game.DIM_X, Game.DIM_Y);
+	};
+	
+	Game.prototype.drawGridLines = function() {
+	  // Draw the grid
+	  var bw = Game.DIM_X;
+	  var bh = Game.DIM_Y;
+	  //size of canvas
+	  var cw = bw + 1;
+	  var ch = bh + 1;
+	  // Vertical lines
+	  this.ctx.strokeStyle = "black";
+	  this.ctx.lineWidth = 1.3;
+	  for (var x = 0; x <= bw; x += this.cellSize) {
+	      this.ctx.moveTo(x, 0);
+	      this.ctx.lineTo(x, bh);
+	      this.ctx.stroke();
+	  }
+	 // Horizontal lines
+	  for (x = 0; x <= bh; x += this.cellSize) {
+	      this.ctx.moveTo(0, x);
+	      this.ctx.lineTo(bw, x);
+	      this.ctx.stroke();
+	  }
+	  return;
+	};
+	
+	Game.prototype.start = function () {
+	  this.draw();
+	  this.drawGridLines();
+	};
+	
+	
 	Game.prototype.drawColony = function(ctx, cellCoord, cellSize){
 	  // Temporary function to fill a particular cell with color
 	  ctx.fillStyle = "green";
 	  ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
-	  this.board.buildColony(cellCoord[0]/ cellSize, cellCoord[1]/ cellSize);
-	};
-	
-	Game.prototype.isOver = function(){
-	  return this.board.isOver();//When no colonies remain alive
+	  // Swap out the hor and vertical coordinates here becuase hor => columns
+	  this.board.buildColony(cellCoord[1]/ cellSize, cellCoord[0]/ cellSize);
 	};
 	
 	Game.prototype.reset = function(){
-	  this.board.status = "paused";
-	  this.board.reset();
+	  this.board = new Board(26, this.ctx, this.cellsize);
+	  this.start();
 	};
-	Game.prototype.run = function(){};
 	Game.prototype.pause = function(){};
 	
 	Game.prototype.step = function(){
-	  if (this.board.status === 'running'){
 	    this.board.step();
-	  }
 	};
 	
 	module.exports = Game;
@@ -113,7 +143,7 @@
 	  this.numCells = numCells;
 	  this.ctx = ctx;
 	  this.cellSize = cellSize;
-	  this.status = 'running';
+	  this.generation = 0;
 	  this.grid = this.populate();
 	};
 	
@@ -138,17 +168,11 @@
 	
 	Board.NEIGHBORS = [[0,-1],[0,1],[1,0],[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]];
 	
-	Board.prototype.isOver = function(){
-	  console.log("Game over");
-	};
-	
 	Board.prototype.reset = function(){
-	  this.status = 'paused';
 	  this.grid = [];
 	};
 	
 	Board.prototype.step = function(){
-	  var numAliveCells = 0;
 	  var newGrid = this.populate();
 	  for(var i = 0; i < this.numCells; i++){
 	    for(var j = 0; j < this.numCells; j++){
@@ -156,35 +180,31 @@
 	
 	      for(var k = 0; k < Board.NEIGHBORS.length; k++){
 	        var delta = Board.NEIGHBORS[k];
-	        var gridVal = this.grid[i+delta[0]] ? this.grid[i+delta[0]][j+delta[1]] || 0 : 0;
+	        var gridVal =
+	          this.grid[i+delta[0]] ? this.grid[i+delta[0]][j+delta[1]] || 0 : 0;
 	        aliveNeighbors += gridVal;
 	      }
 	        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1
 	        // else it lives;
 	        if (this.grid[i][j] === 1){
-	          if (aliveNeighbors > 4 || aliveNeighbors < 1){
+	          if (aliveNeighbors >= 4 || aliveNeighbors <= 1){
 	            newGrid[i][j] = null;
 	          }
 	          else{
 	            newGrid[i][j] = this.grid[i][j];
-	            numAliveCells += 1;
 	          }
 	        }
 	        // If cell is dead and it has aliveNeighbors == 3, it becomes alive
 	        else if (!this.grid[i][j] && aliveNeighbors === 3){
 	          newGrid[i][j] = 1;
-	          numAliveCells += 1;
 	        }
 	        else{
 	          newGrid[i][j] = this.grid[i][j];
-	          numAliveCells += this.grid[i][j];
 	         }
 	    }//for j
 	  }//for i
 	  this.grid = newGrid;
-	  if(!numAliveCells){
-	    return this.game.isOver();
-	  }
+	  this.generation += 1;
 	  this.draw();
 	};//step
 	
@@ -201,7 +221,7 @@
 	    var row = this.grid[i];
 	    for(var j = 0; j < row.length; j++){
 	      if(this.grid[i][j] === 1){
-	        this.ctx.fillRect(i*sz, j*sz, sz-2, sz-2);
+	        this.ctx.fillRect(j*sz, i*sz, sz-2, sz-2);
 	      }
 	    }
 	  }
@@ -260,11 +280,10 @@
 	  // Get the canvas coordinates
 	  var canvasDim = this.canvas.getBoundingClientRect();
 	  //Distance from left of canvas
-	  var xCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
+	  var horCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
 	  //Distance from top of canvas
-	  var yCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
-	  var cellCoord = [xCellNum* this.cellSize, yCellNum * this.cellSize];
-	
+	  var verCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
+	  var cellCoord = [horCellNum* this.cellSize, verCellNum * this.cellSize];
 	  this.game.drawColony(this.ctx, cellCoord ,this.cellSize);
 	};
 	
@@ -316,31 +335,40 @@
 	var MenuBar = function(game, gv){
 	  this.game = game;
 	  this.gameView = gv;
-	  this.status = 'paused';
-	  var start = document.getElementById('start-button');
-	  var reset = document.getElementById('reset-button');
-	  start.addEventListener('click', this.start.bind(this));
-	  reset.addEventListener('click', this.reset.bind(this));
+	  this.getButtonRefs();
+	  this.addButtonListeners();
+	};
+	MenuBar.prototype.getButtonRefs = function(){
+	  this.startGOL = document.getElementById('start-button');
+	  this.stopGOL = document.getElementById('stop-button');
+	  this.resetGOL = document.getElementById('reset-button');
+	  this.stepGOL = document.getElementById('step-button');
 	};
 	
-	MenuBar.prototype.start = function(){
-	  if (this.status === 'paused'){
-	    this.status = 'running';
-	    this.gameRun = setInterval(this.game.step.bind(this.game), 500);
-	  }
-	  else if(this.status === 'running'){
-	    this.status = 'paused';
+	MenuBar.prototype.addButtonListeners = function(){
+	  this.startGOL.addEventListener('click', this.startGame.bind(this));
+	  this.stopGOL.addEventListener('click', this.stopGame.bind(this));
+	  this.resetGOL.addEventListener('click', this.resetGame.bind(this));
+	  this.stepGOL.addEventListener('click', this.stepGame.bind(this));
+	};
+	
+	MenuBar.prototype.startGame = function(){
+	    this.gameRun = setInterval(this.game.step.bind(this.game), 300);
+	};
+	MenuBar.prototype.stopGame = function(){
+	  clearInterval(this.gameRun);
+	};
+	
+	MenuBar.prototype.resetGame = function(){
+	  if (this.gameRun){
+	    console.log("stoppping the asynchronous callback");
 	    clearInterval(this.gameRun);
 	  }
-	};
-	
-	MenuBar.prototype.reset = function(){
-	  this.status = 'paused';
 	  this.game.reset();
-	  this.gameView.start();
 	};
-	
-	
+	MenuBar.prototype.stepGame = function(){
+	  this.game.step();
+	};
 	module.exports = MenuBar;
 
 
