@@ -1,8 +1,8 @@
-var GameView = function (game, ctx, canvasEl) {
+var GameView = function (game, ctx, canvasEl, cellSize) {
   this.canvas = canvasEl;
   this.ctx = ctx;
   this.game = game;
-  this.cellSize = 20;
+  this.cellSize = cellSize;
   this.horCells = GameView.DIM_X/ this.cellSize;
   this.verCells = GameView.DIM_Y/ this.cellSize;
   this.bindListener();
@@ -24,7 +24,7 @@ GameView.prototype.handleClick = function(e){
   var yCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
   var cellCoord = [xCellNum* this.cellSize, yCellNum * this.cellSize];
 
-  this.game.draw(this.ctx, cellCoord ,this.cellSize);
+  this.game.drawColony(this.ctx, cellCoord ,this.cellSize);
 };
 
 GameView.prototype.draw = function(){
@@ -33,7 +33,7 @@ GameView.prototype.draw = function(){
   this.ctx.fillRect(0, 0, GameView.DIM_X, GameView.DIM_Y);
 };
 
-GameView.prototype.drawGridLines = function(lineOptions) {
+GameView.prototype.drawGridLines = function() {
   // Draw the grid
   //padding around grid
   var bw = GameView.DIM_X;
@@ -41,7 +41,6 @@ GameView.prototype.drawGridLines = function(lineOptions) {
   //size of canvas
   var cw = bw + 1;
   var ch = bh + 1;
-
   // Vertical lines
   this.ctx.strokeStyle = "black";
   this.ctx.lineWidth = 1.3;
@@ -61,23 +60,23 @@ GameView.prototype.drawGridLines = function(lineOptions) {
 
 
 GameView.prototype.start = function () {
-  this.lastTime = 0;
+  // this.lastTime = 0;
   this.draw();
-  this.drawGridLines({lineSpacing: 40});
+  this.drawGridLines();
   //start the animation
   // requestAnimationFrame(this.animate.bind(this));
 };
 
-GameView.prototype.animate = function(time){
-  var timeDelta = time - this.lastTime;
-  this.drawGridLines({color: "red"});
-
-  // this.game.step(timeDelta);
-  // this.game.draw(this.ctx);
-  this.lastTime = time;
-
-  requestAnimationFrame(this.animate.bind(this));
-};
+// GameView.prototype.animate = function(time){
+//   var timeDelta = time - this.lastTime;
+//   this.drawGridLines({color: "red"});
+//
+//   // this.game.step(timeDelta);
+//   // this.game.draw(this.ctx);
+//   this.lastTime = time;
+//
+//   requestAnimationFrame(this.animate.bind(this));
+// };
 
 module.exports = GameView;
 window.GameView = GameView;

@@ -1,8 +1,102 @@
-var Board = function(){
-  this.grid = [];
+var Board = function(numCells, ctx, cellSize){
+  this.colony = [];
+  this.numCells = numCells;
+  this.ctx = ctx;
+  this.cellSize = cellSize;
+  this.grid = this.populate();
 };
 
+Board.DIM_X = 520;
+Board.DIM_Y = 520;
+
 Board.prototype.populate = function(){
-  
+  var grid = [];
+  for(var i = 0; i < this.numCells; i++){
+    grid.push([]);
+    for(var j = 0; j < this.numCells; j++){
+    grid[i].push(null);
+    }
+  }
+  return grid;
+};
+
+Board.prototype.buildColony = function(x, y){
+  this.colony.push([x,y]);
+  this.grid[x][y] = 1;
+};
+
+Board.NEIGHBORS = [[0,-1],[0,1],[1,0],[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]];
+
+Board.prototype.step = function(){
+  var newGrid = this.populate();
+  for(var i = 0; i < this.numCells; i++){
+    for(var j = 0; j < this.numCells; j++){
+      var aliveNeighbors = 0;
+
+      for(var k = 0; k < Board.NEIGHBORS.length; k++){
+        var delta = Board.NEIGHBORS[k];
+        var gridVal = this.grid[i+delta[0]] ? this.grid[i+delta[0]][j+delta[1]] || 0 : 0;
+        aliveNeighbors += gridVal;
+        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1;
+        if (this.grid[i][j] === 1 && (aliveNeighbors > 4 || aliveNeighbors < 1)){
+          newGrid[i][j] = null;
+        }
+        // If cell is dead and it has aliveNeighbors == 3, it becomes alive
+        else if (!this.grid[i][j] && aliveNeighbors === 3){
+          newGrid[i][j] = 1;
+        }
+        else{
+          newGrid[i][j] = this.grid[i][j];
+         }
+      }
+    }
+  }
+  this.grid = newGrid;
+  this.draw();
+};
+
+Board.prototype.draw = function(){
+  var sz = this.cellSize;
+  // Clear up the board
+  this.ctx.clearRect(0, 0, Board.DIM_X, Board.DIM_Y);
+  this.ctx.fillStyle = 'grey';
+  this.ctx.fillRect(0, 0, Board.DIM_X, Board.DIM_Y);
+  // Redraw the board
+  var self = this;
+  this.ctx.fillStyle = "yellow";
+  for(var i = 0; i < this.grid.length; i++){
+    var row = this.grid[i];
+    for(var j = 0; j < row.length; j++){
+      if(this.grid[i][j] === 1){
+        this.ctx.fillRect(i*sz, j*sz, sz-2, sz-2);
+      }
+    }
+  }
+this.drawGridLines();
+};
+
+Board.prototype.drawGridLines = function() {
+  // Draw the grid
+  //padding around grid
+  var bw = Board.DIM_X;
+  var bh = Board.DIM_Y;
+  //size of canvas
+  var cw = bw + 1;
+  var ch = bh + 1;
+  // Vertical lines
+  this.ctx.strokeStyle = "black";
+  this.ctx.lineWidth = 1.3;
+  for (var x = 0; x <= bw; x += this.cellSize) {
+      this.ctx.moveTo(x, 0);
+      this.ctx.lineTo(x, bh);
+      this.ctx.stroke();
+  }
+ // Horizontal lines
+  for (x = 0; x <= bh; x += this.cellSize) {
+      this.ctx.moveTo(0, x);
+      this.ctx.lineTo(bw, x);
+      this.ctx.stroke();
+  }
+  return;
 };
 module.exports = Board;
