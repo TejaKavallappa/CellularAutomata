@@ -79,7 +79,7 @@ Board.prototype.updateGrid = function(){
   for(var i = 0; i < this.newCells.length; i++){
     var cell = this.newCells[i];
     this.ctx.fillStyle = (cell.state === 'alive') ? 'yellow' : 'grey';
-    this.ctx.fillRect(cell.y*sz, cell.x*sz, sz-2, sz-2);
+    this.ctx.fillRect(cell.y*sz, cell.x*sz, sz-1, sz-1);
   }
 };
 
@@ -127,5 +127,9 @@ Board.prototype.drawGridLines = function() {
       this.ctx.stroke();
   }
   return;
+};
+ Board.prototype.start = function () {
+  this.draw();
+  this.drawGridLines();
 };
 module.exports = Board;

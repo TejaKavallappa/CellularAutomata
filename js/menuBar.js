@@ -1,7 +1,9 @@
 
-var MenuBar = function(game, gv){
+var MenuBar = function(game, canvasEl, cellSize, ctx){
   this.game = game;
-  this.gameView = gv;
+  this.canvas = canvasEl;
+  this.cellSize = cellSize;
+  this.ctx = ctx;
   this.getButtonRefs();
   this.addButtonListeners();
 };
@@ -13,6 +15,7 @@ MenuBar.prototype.getButtonRefs = function(){
 };
 
 MenuBar.prototype.addButtonListeners = function(){
+  this.canvas.addEventListener('click', this.handleClick.bind(this));
   this.startGOL.addEventListener('click', this.startGame.bind(this));
   this.stopGOL.addEventListener('click', this.stopGame.bind(this));
   this.resetGOL.addEventListener('click', this.resetGame.bind(this));
@@ -35,5 +38,15 @@ MenuBar.prototype.resetGame = function(){
 };
 MenuBar.prototype.stepGame = function(){
   this.game.step();
+};
+MenuBar.prototype.handleClick = function(e){
+  // Get the canvas coordinates
+  var canvasDim = this.canvas.getBoundingClientRect();
+  //Distance from left of canvas
+  var horCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
+  //Distance from top of canvas
+  var verCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
+  var cellCoord = [horCellNum* this.cellSize, verCellNum * this.cellSize];
+  this.game.drawColony(this.ctx, cellCoord ,this.cellSize);
 };
 module.exports = MenuBar;
