@@ -52,13 +52,10 @@ Game.prototype.drawColony = function(ctx, cellCoord, cellSize){
   this.board.buildColony(cellCoord[1]/ cellSize, cellCoord[0]/ cellSize);
 };
 
-Game.prototype.reset = function(){
-  this.board = new Board(26, this.ctx, this.cellsize);
-  this.start();
-};
 Game.prototype.pause = function(){};
 
 Game.prototype.step = function(){
+  console.log("arrived at game step");
     this.board.step();
 };
 

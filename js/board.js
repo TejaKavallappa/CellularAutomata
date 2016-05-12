@@ -29,10 +29,6 @@ Board.prototype.buildColony = function(x, y){
 
 Board.NEIGHBORS = [[0,-1],[0,1],[1,0],[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]];
 
-Board.prototype.reset = function(){
-  this.currentGrid = [];
-};
-
 Board.prototype.step = function(){
   this.newGrid = this.populate();
   this.newCells = [];

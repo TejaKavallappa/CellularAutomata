@@ -23,6 +23,7 @@ MenuBar.prototype.addButtonListeners = function(){
 };
 
 MenuBar.prototype.startGame = function(){
+    console.log("start clicked");
     this.gameRun = setInterval(this.game.step.bind(this.game), 300);
 };
 MenuBar.prototype.stopGame = function(){
@@ -34,8 +35,9 @@ MenuBar.prototype.resetGame = function(){
     console.log("stoppping the asynchronous callback");
     clearInterval(this.gameRun);
   }
-  this.game.reset();
+  document.location.reload(true);
 };
+
 MenuBar.prototype.stepGame = function(){
   this.game.step();
 };

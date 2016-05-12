@@ -120,13 +120,10 @@
 	  this.board.buildColony(cellCoord[1]/ cellSize, cellCoord[0]/ cellSize);
 	};
 	
-	Game.prototype.reset = function(){
-	  this.board = new Board(26, this.ctx, this.cellsize);
-	  this.start();
-	};
 	Game.prototype.pause = function(){};
 	
 	Game.prototype.step = function(){
+	  console.log("arrived at game step");
 	    this.board.step();
 	};
 	
@@ -168,10 +165,6 @@
 	};
 	
 	Board.NEIGHBORS = [[0,-1],[0,1],[1,0],[-1,0],[-1,-1],[-1,1],[1,-1],[1,1]];
-	
-	Board.prototype.reset = function(){
-	  this.currentGrid = [];
-	};
 	
 	Board.prototype.step = function(){
 	  this.newGrid = this.populate();
@@ -305,6 +298,7 @@
 	};
 	
 	MenuBar.prototype.startGame = function(){
+	    console.log("start clicked");
 	    this.gameRun = setInterval(this.game.step.bind(this.game), 300);
 	};
 	MenuBar.prototype.stopGame = function(){
@@ -316,8 +310,9 @@
 	    console.log("stoppping the asynchronous callback");
 	    clearInterval(this.gameRun);
 	  }
-	  this.game.reset();
+	  document.location.reload(true);
 	};
+	
 	MenuBar.prototype.stepGame = function(){
 	  this.game.step();
 	};
