@@ -40,7 +40,6 @@ MenuBar.prototype.stepGame = function(){
   this.game.step();
 };
 MenuBar.prototype.handleClick = function(e){
-  console.log("on click activated");
   // Get the canvas coordinates
   var canvasDim = this.canvas.getBoundingClientRect();
   //Distance from left of canvas

@@ -98,7 +98,7 @@ Board.prototype.draw = function(){
     var row = this.grid[i];
     for(var j = 0; j < row.length; j++){
       if(this.grid[i][j] === 1){
-        this.ctx.fillRect(j*sz, i*sz, sz-2, sz-2);
+        this.ctx.fillRect(j*sz, i*sz, sz-1, sz-1);
       }
     }
   }
