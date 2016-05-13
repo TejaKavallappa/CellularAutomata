@@ -23,7 +23,6 @@ MenuBar.prototype.addButtonListeners = function(){
 };
 
 MenuBar.prototype.startGame = function(){
-    console.log("start clicked");
     this.gameRun = setInterval(this.game.step.bind(this.game), 300);
 };
 MenuBar.prototype.stopGame = function(){
@@ -32,7 +31,6 @@ MenuBar.prototype.stopGame = function(){
 
 MenuBar.prototype.resetGame = function(){
   if (this.gameRun){
-    console.log("stoppping the asynchronous callback");
     clearInterval(this.gameRun);
   }
   document.location.reload(true);
@@ -49,6 +47,6 @@ MenuBar.prototype.handleClick = function(e){
   //Distance from top of canvas
   var verCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
   var cellCoord = [horCellNum* this.cellSize, verCellNum * this.cellSize];
-  this.game.drawColony(this.ctx, cellCoord ,this.cellSize);
+  this.game.drawColony(cellCoord);
 };
 module.exports = MenuBar;

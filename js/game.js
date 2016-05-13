@@ -4,6 +4,7 @@ var Game = function(ctx, cellSize){
   this.board = new Board(26, ctx, cellSize);
   this.colony = [];
   this.ctx = ctx;
+  this.cellSize = cellSize;
 };
 Game.DIM_X = 520;
 Game.DIM_Y = 520;
@@ -23,7 +24,7 @@ Game.prototype.drawGridLines = function() {
   var ch = bh + 1;
   // Vertical lines
   this.ctx.strokeStyle = "black";
-  this.ctx.lineWidth = 1.3;
+  this.ctx.lineWidth = 1;
   for (var x = 0; x <= bw; x += this.cellSize) {
       this.ctx.moveTo(x, 0);
       this.ctx.lineTo(x, bh);
@@ -44,7 +45,9 @@ Game.prototype.start = function () {
 };
 
 
-Game.prototype.drawColony = function(ctx, cellCoord, cellSize){
+Game.prototype.drawColony = function(cellCoord){
+  var ctx = this.ctx;
+  var cellSize = this.cellSize;
   // Temporary function to fill a particular cell with color
   ctx.fillStyle = "green";
   ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
@@ -55,7 +58,6 @@ Game.prototype.drawColony = function(ctx, cellCoord, cellSize){
 Game.prototype.pause = function(){};
 
 Game.prototype.step = function(){
-  console.log("arrived at game step");
     this.board.step();
 };
 
