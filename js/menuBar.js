@@ -40,12 +40,14 @@ MenuBar.prototype.stepGame = function(){
   this.game.step();
 };
 MenuBar.prototype.handleClick = function(e){
+  console.log("on click activated");
   // Get the canvas coordinates
   var canvasDim = this.canvas.getBoundingClientRect();
   //Distance from left of canvas
-  var horCellNum = Math.floor((e.pageX - canvasDim.left)/ this.cellSize);
+  var horCellNum = Math.floor((e.clientX - canvasDim.left)/ this.cellSize);
   //Distance from top of canvas
-  var verCellNum = Math.floor((e.pageY - canvasDim.top)/ this.cellSize);
+  var verCellNum = Math.floor((e.clientY - canvasDim.top)/ this.cellSize);
+
   var cellCoord = [horCellNum* this.cellSize, verCellNum * this.cellSize];
   this.game.drawColony(cellCoord);
 };

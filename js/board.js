@@ -24,7 +24,9 @@ Board.prototype.populate = function(){
 
 Board.prototype.buildColony = function(x, y){
   // this.colony.push([x,y]);
-  this.grid[x][y] = 1;
+  if(x < this.numCells && y < this.numCells){
+    this.grid[x][y] = 1;
+  }
 };
 
 Board.NEIGHBORS = [
