@@ -80,8 +80,8 @@ Board.prototype.updateGrid = function(){
   var sz = this.cellSize;
   for(var i = 0; i < this.newCells.length; i++){
     var cell = this.newCells[i];
-    this.ctx.fillStyle = (cell.state === 'alive') ? 'yellow' : 'grey';
-    this.ctx.fillRect(cell.y*sz, cell.x*sz, sz-1, sz-1);
+    this.ctx.fillStyle = (cell.state === 'alive') ? 'yellow' : 'lightgrey';
+    this.ctx.fillRect(cell.y*sz+1, cell.x*sz+1, sz-2, sz-2);
   }
 };
 
@@ -98,7 +98,7 @@ Board.prototype.draw = function(){
     var row = this.grid[i];
     for(var j = 0; j < row.length; j++){
       if(this.grid[i][j] === 1){
-        this.ctx.fillRect(j*sz, i*sz, sz-1, sz-1);
+        this.ctx.fillRect(j*sz, i*sz, sz-2, sz-2);
       }
     }
   }
@@ -110,9 +110,7 @@ Board.prototype.drawGridLines = function() {
   //padding around grid
   var bw = Board.DIM_X;
   var bh = Board.DIM_Y;
-  //size of canvas
-  var cw = bw + 1;
-  var ch = bh + 1;
+
   // Vertical lines
   this.ctx.strokeStyle = "black";
   this.ctx.lineWidth = 1;

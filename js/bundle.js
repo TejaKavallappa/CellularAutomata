@@ -89,9 +89,7 @@
 	  // Draw the grid
 	  var bw = Game.DIM_X;
 	  var bh = Game.DIM_Y;
-	  //size of canvas
-	  var cw = bw + 1;
-	  var ch = bh + 1;
+	
 	  // Vertical lines
 	  this.ctx.strokeStyle = "black";
 	  this.ctx.lineWidth = 1;
@@ -221,8 +219,8 @@
 	  var sz = this.cellSize;
 	  for(var i = 0; i < this.newCells.length; i++){
 	    var cell = this.newCells[i];
-	    this.ctx.fillStyle = (cell.state === 'alive') ? 'yellow' : 'grey';
-	    this.ctx.fillRect(cell.y*sz, cell.x*sz, sz-1, sz-1);
+	    this.ctx.fillStyle = (cell.state === 'alive') ? 'yellow' : 'lightgrey';
+	    this.ctx.fillRect(cell.y*sz+1, cell.x*sz+1, sz-2, sz-2);
 	  }
 	};
 	
@@ -239,7 +237,7 @@
 	    var row = this.grid[i];
 	    for(var j = 0; j < row.length; j++){
 	      if(this.grid[i][j] === 1){
-	        this.ctx.fillRect(j*sz, i*sz, sz-1, sz-1);
+	        this.ctx.fillRect(j*sz, i*sz, sz-2, sz-2);
 	      }
 	    }
 	  }
@@ -251,9 +249,7 @@
 	  //padding around grid
 	  var bw = Board.DIM_X;
 	  var bh = Board.DIM_Y;
-	  //size of canvas
-	  var cw = bw + 1;
-	  var ch = bh + 1;
+	
 	  // Vertical lines
 	  this.ctx.strokeStyle = "black";
 	  this.ctx.lineWidth = 1;
@@ -356,6 +352,7 @@
 	var Colony = function(canvasEl, cellSize, game){
 	  this.blinker = [[0, 1, 0], [0, 1, 0], [0, 1, 0]];
 	  this.toad_blinker = [[0, 1, 1, 1],[1, 1, 1, 0]];
+	  this.glider_spaceship = [[0, 0, 1],[1, 0, 1],[0, 1, 1]];
 	
 	  this.getButtonRefs();
 	  this.addButtonListeners();
@@ -367,6 +364,7 @@
 	Colony.prototype.getButtonRefs = function(){
 	  this.osc = document.getElementById("osc");
 	  this.toad = document.getElementById("toad");
+	  this.glider = document.getElementById("glider");
 	  this.trg = document.getElementById("can-div");
 	};
 	
@@ -374,6 +372,8 @@
 	  this.osc.addEventListener('dragstart',
 	    this.dragstart_handler.bind(this));
 	  this.toad.addEventListener('dragstart',
+	    this.dragstart_handler.bind(this));
+	  this.glider.addEventListener('dragstart',
 	    this.dragstart_handler.bind(this));
 	
 	  this.trg.addEventListener('dragover', this.dragover_handler.bind(this));
@@ -383,6 +383,10 @@
 	  this.toad.addEventListener('dragover', this.dragover_handler.bind(this));
 	  this.toad.addEventListener('dragenter', this.dragover_handler.bind(this));
 	  this.toad.addEventListener('drop', this.ondrop_handler.bind(this));
+	
+	  this.glider.addEventListener('dragover', this.dragover_handler.bind(this));
+	  this.glider.addEventListener('dragenter', this.dragover_handler.bind(this));
+	  this.glider.addEventListener('drop', this.ondrop_handler.bind(this));
 	};
 	
 	Colony.prototype.dragstart_handler = function(ev) {
@@ -412,13 +416,17 @@
 	    case "toad":
 	      data = this.toad_blinker;
 	      break;
+	    case "glider":
+	      data = this.glider_spaceship;
+	      break;
 	  }
 	  var x = cellCoord[0];
 	  var y = cellCoord[1];
 	  for(var i = 0; i < data.length; i++){
 	    x = cellCoord[0];
 	    for(var j = 0; j < data[i].length; j++){
-	      if (data[i][j] && x >= 0 && x <= canvasDim.height && y >= 0 && y <= canvasDim.width){
+	      if (data[i][j] && x >= 0 && x <= canvasDim.height &&
+	        y >= 0 && y <= canvasDim.width){
 	        this.game.drawColony([x,y]);
 	      }
 	      x += this.cellSize;

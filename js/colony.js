@@ -1,6 +1,7 @@
 var Colony = function(canvasEl, cellSize, game){
   this.blinker = [[0, 1, 0], [0, 1, 0], [0, 1, 0]];
   this.toad_blinker = [[0, 1, 1, 1],[1, 1, 1, 0]];
+  this.glider_spaceship = [[0, 0, 1],[1, 0, 1],[0, 1, 1]];
 
   this.getButtonRefs();
   this.addButtonListeners();
@@ -12,6 +13,7 @@ var Colony = function(canvasEl, cellSize, game){
 Colony.prototype.getButtonRefs = function(){
   this.osc = document.getElementById("osc");
   this.toad = document.getElementById("toad");
+  this.glider = document.getElementById("glider");
   this.trg = document.getElementById("can-div");
 };
 
@@ -19,6 +21,8 @@ Colony.prototype.addButtonListeners = function(){
   this.osc.addEventListener('dragstart',
     this.dragstart_handler.bind(this));
   this.toad.addEventListener('dragstart',
+    this.dragstart_handler.bind(this));
+  this.glider.addEventListener('dragstart',
     this.dragstart_handler.bind(this));
 
   this.trg.addEventListener('dragover', this.dragover_handler.bind(this));
@@ -28,6 +32,10 @@ Colony.prototype.addButtonListeners = function(){
   this.toad.addEventListener('dragover', this.dragover_handler.bind(this));
   this.toad.addEventListener('dragenter', this.dragover_handler.bind(this));
   this.toad.addEventListener('drop', this.ondrop_handler.bind(this));
+
+  this.glider.addEventListener('dragover', this.dragover_handler.bind(this));
+  this.glider.addEventListener('dragenter', this.dragover_handler.bind(this));
+  this.glider.addEventListener('drop', this.ondrop_handler.bind(this));
 };
 
 Colony.prototype.dragstart_handler = function(ev) {
@@ -57,13 +65,17 @@ Colony.prototype.drawPattern = function(patternId, cellCoord, canvasDim){
     case "toad":
       data = this.toad_blinker;
       break;
+    case "glider":
+      data = this.glider_spaceship;
+      break;
   }
   var x = cellCoord[0];
   var y = cellCoord[1];
   for(var i = 0; i < data.length; i++){
     x = cellCoord[0];
     for(var j = 0; j < data[i].length; j++){
-      if (data[i][j] && x >= 0 && x <= canvasDim.height && y >= 0 && y <= canvasDim.width){
+      if (data[i][j] && x >= 0 && x <= canvasDim.height &&
+        y >= 0 && y <= canvasDim.width){
         this.game.drawColony([x,y]);
       }
       x += this.cellSize;

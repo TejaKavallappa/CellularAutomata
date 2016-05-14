@@ -19,9 +19,7 @@ Game.prototype.drawGridLines = function() {
   // Draw the grid
   var bw = Game.DIM_X;
   var bh = Game.DIM_Y;
-  //size of canvas
-  var cw = bw + 1;
-  var ch = bh + 1;
+
   // Vertical lines
   this.ctx.strokeStyle = "black";
   this.ctx.lineWidth = 1;
