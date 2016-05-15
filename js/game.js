@@ -3,9 +3,14 @@ var Game = function(ctx, cellSize, board){
   this.colony = [];
   this.ctx = ctx;
   this.cellSize = cellSize;
+  Game.DIM_X = window.WIDTH;
+  Game.DIM_Y = window.HEIGHT;
 };
-Game.DIM_X = 520;
-Game.DIM_Y = 520;
+
+Game.prototype.start = function () {
+  this.draw();
+  this.drawGridLines();
+};
 
 Game.prototype.draw = function(){
   this.ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
@@ -33,11 +38,6 @@ Game.prototype.drawGridLines = function() {
       this.ctx.stroke();
   }
   return;
-};
-
-Game.prototype.start = function () {
-  this.draw();
-  this.drawGridLines();
 };
 
 Game.prototype.drawColony = function(cellCoord){

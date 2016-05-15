@@ -88,8 +88,8 @@ Colony.prototype.drawPattern = function(patternId, cellCoord, canvasDim){
   for(var i = 0; i < data.length; i++){
     x = cellCoord[0];
     for(var j = 0; j < data[i].length; j++){
-      if (data[i][j] && x >= 0 && x <= canvasDim.height &&
-        y >= 0 && y <= canvasDim.width){
+      if (data[i][j] && x >= 0 && x <= canvasDim.right &&
+        y >= 0 && y <= canvasDim.bottom){
         this.game.drawColony([x,y]);
       }
       x += this.cellSize;
@@ -97,6 +97,7 @@ Colony.prototype.drawPattern = function(patternId, cellCoord, canvasDim){
     y += this.cellSize;
   }
 };
+
 Colony.prototype.dragover_handler = function(ev){
   ev.preventDefault();
 };

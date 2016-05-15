@@ -5,12 +5,15 @@ var Colony = require("./colony");
 
 document.addEventListener("DOMContentLoaded", function(){
   var canvasEl = document.getElementsByTagName("canvas")[0];
-  canvasEl.width = Game.DIM_X;
-  canvasEl.height = Game.DIM_Y;
-
+  window.WIDTH = 980;
+  window.HEIGHT = 520;
+  canvasEl.width = window.WIDTH;
+  canvasEl.height = window.HEIGHT;
   var cellSize = 20;
   var ctx = canvasEl.getContext("2d");
-  var board = new Board(26, ctx, cellSize);
+  
+  var board = new Board([canvasEl.width/ cellSize, canvasEl.height/ cellSize],
+     ctx, cellSize);
   var game = new Game(ctx, cellSize, board);
   var menu = new MenuBar(game, canvasEl, cellSize, ctx);
   var colony = new Colony(canvasEl, cellSize, game);

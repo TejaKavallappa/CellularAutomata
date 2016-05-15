@@ -7,14 +7,11 @@ var Board = function(numCells, ctx, cellSize){
   this.grid = this.populate();
 };
 
-Board.DIM_X = 520;
-Board.DIM_Y = 520;
-
 Board.prototype.populate = function(){
   var grid = [];
-  for(var i = 0; i < this.numCells; i++){
+  for(var i = 0; i < this.numCells[1]; i++){
     grid.push([]);
-    for(var j = 0; j < this.numCells; j++){
+    for(var j = 0; j < this.numCells[0]; j++){
     grid[i].push(null);
     }
   }
@@ -22,7 +19,8 @@ Board.prototype.populate = function(){
 };
 
 Board.prototype.buildColony = function(x, y, cellCoord){
-  if(x < this.numCells && y < this.numCells){
+  debugger;
+  if(x < this.numCells[1] && y < this.numCells[0]){
     if(this.grid[x][y]){
       this.grid[x][y] = null;
       this.undoSelect(cellCoord);
@@ -49,8 +47,8 @@ Board.NEIGHBORS = [
 Board.prototype.step = function(){
   this.newGrid = this.populate();
   this.newCells = [];
-  for(var i = 0; i < this.numCells; i++){
-    for(var j = 0; j < this.numCells; j++){
+  for(var i = 0; i < this.numCells[1]; i++){
+    for(var j = 0; j < this.numCells[0]; j++){
       var aliveNeighbors = 0;
 
       for(var k = 0; k < Board.NEIGHBORS.length; k++){
@@ -61,6 +59,7 @@ Board.prototype.step = function(){
       }
         //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1
         // else it lives;
+
         if (this.grid[i][j] === 1){
           this.alive = true;
           if (aliveNeighbors >= 4 || aliveNeighbors <= 1){

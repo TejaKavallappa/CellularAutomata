@@ -45,18 +45,21 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Game = __webpack_require__(1);
-	var MenuBar = __webpack_require__(4);
-	var Board = __webpack_require__(2);
+	var MenuBar = __webpack_require__(2);
+	var Board = __webpack_require__(3);
 	var Colony = __webpack_require__(5);
 	
 	document.addEventListener("DOMContentLoaded", function(){
 	  var canvasEl = document.getElementsByTagName("canvas")[0];
-	  canvasEl.width = Game.DIM_X;
-	  canvasEl.height = Game.DIM_Y;
-	
+	  window.WIDTH = 980;
+	  window.HEIGHT = 520;
+	  canvasEl.width = window.WIDTH;
+	  canvasEl.height = window.HEIGHT;
 	  var cellSize = 20;
 	  var ctx = canvasEl.getContext("2d");
-	  var board = new Board(26, ctx, cellSize);
+	  
+	  var board = new Board([canvasEl.width/ cellSize, canvasEl.height/ cellSize],
+	     ctx, cellSize);
 	  var game = new Game(ctx, cellSize, board);
 	  var menu = new MenuBar(game, canvasEl, cellSize, ctx);
 	  var colony = new Colony(canvasEl, cellSize, game);
@@ -73,9 +76,14 @@
 	  this.colony = [];
 	  this.ctx = ctx;
 	  this.cellSize = cellSize;
+	  Game.DIM_X = window.WIDTH;
+	  Game.DIM_Y = window.HEIGHT;
 	};
-	Game.DIM_X = 520;
-	Game.DIM_Y = 520;
+	
+	Game.prototype.start = function () {
+	  this.draw();
+	  this.drawGridLines();
+	};
 	
 	Game.prototype.draw = function(){
 	  this.ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
@@ -105,11 +113,6 @@
 	  return;
 	};
 	
-	Game.prototype.start = function () {
-	  this.draw();
-	  this.drawGridLines();
-	};
-	
 	Game.prototype.drawColony = function(cellCoord){
 	  var ctx = this.ctx;
 	  var cellSize = this.cellSize;
@@ -130,125 +133,6 @@
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Cell = __webpack_require__(3);
-	var Board = function(numCells, ctx, cellSize){
-	  this.numCells = numCells;
-	  this.ctx = ctx;
-	  this.cellSize = cellSize;
-	  this.generation = 0;
-	  this.grid = this.populate();
-	};
-	
-	Board.DIM_X = 520;
-	Board.DIM_Y = 520;
-	
-	Board.prototype.populate = function(){
-	  var grid = [];
-	  for(var i = 0; i < this.numCells; i++){
-	    grid.push([]);
-	    for(var j = 0; j < this.numCells; j++){
-	    grid[i].push(null);
-	    }
-	  }
-	  return grid;
-	};
-	
-	Board.prototype.buildColony = function(x, y, cellCoord){
-	  if(x < this.numCells && y < this.numCells){
-	    if(this.grid[x][y]){
-	      this.grid[x][y] = null;
-	      this.undoSelect(cellCoord);
-	    }
-	    else{
-	    this.grid[x][y] = 1;
-	  }
-	  }
-	};
-	
-	Board.prototype.undoSelect = function(cellCoord){
-	  var ctx = this.ctx;
-	  var cellSize = this.cellSize;
-	  ctx.fillStyle = "grey";
-	  ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
-	};
-	
-	Board.NEIGHBORS = [
-	  [0,-1],[0,1],
-	  [1,0],[-1,0],
-	  [-1,-1],[-1,1],
-	  [1,-1],[1,1]];
-	
-	Board.prototype.step = function(){
-	  this.newGrid = this.populate();
-	  this.newCells = [];
-	  for(var i = 0; i < this.numCells; i++){
-	    for(var j = 0; j < this.numCells; j++){
-	      var aliveNeighbors = 0;
-	
-	      for(var k = 0; k < Board.NEIGHBORS.length; k++){
-	        var delta = Board.NEIGHBORS[k];
-	        var gridVal =
-	          this.grid[i+delta[0]] ? this.grid[i+delta[0]][j+delta[1]] || 0 : 0;
-	        aliveNeighbors += gridVal;
-	      }
-	        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1
-	        // else it lives;
-	        if (this.grid[i][j] === 1){
-	          this.alive = true;
-	          if (aliveNeighbors >= 4 || aliveNeighbors <= 1){
-	            this.newGrid[i][j] = null;
-	            this.newCells.push(new Cell([i,j],'dead'));
-	          }
-	          else{
-	            this.newGrid[i][j] = this.grid[i][j];
-	          }
-	        }
-	        // If cell is dead and it has aliveNeighbors == 3, it becomes alive
-	        else if (!this.grid[i][j] && aliveNeighbors === 3){
-	          this.newGrid[i][j] = 1;
-	          this.newCells.push(new Cell([i,j],'alive'));
-	        }
-	        else{
-	          this.newGrid[i][j] = this.grid[i][j];
-	         }
-	    }//for j
-	  }//for i
-	  this.grid = this.newGrid;
-	  this.generation += 1;
-	  // console.log(this.generation);
-	  this.updateGrid(this.newCells);
-	};//step
-	
-	Board.prototype.updateGrid = function(){
-	  // Iterate through new cells and only update the colours of those cells
-	  var sz = this.cellSize;
-	  for(var i = 0; i < this.newCells.length; i++){
-	    var cell = this.newCells[i];
-	    this.ctx.fillStyle = (cell.state === 'alive') ? '#2D5C8A' : '#bdbdbd';
-	    this.ctx.fillRect(cell.y*sz+1, cell.x*sz+1, sz-2, sz-2);
-	  }
-	};
-	
-	module.exports = Board;
-
-
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	var Cell = function(location, state){
-	  this.x = location[0];
-	  this.y = location[1];
-	  this.state = state;
-	};
-	
-	module.exports = Cell;
-
-
-/***/ },
-/* 4 */
 /***/ function(module, exports) {
 
 	
@@ -314,6 +198,124 @@
 	  this.game.drawColony(cellCoord);
 	};
 	module.exports = MenuBar;
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Cell = __webpack_require__(4);
+	var Board = function(numCells, ctx, cellSize){
+	  this.numCells = numCells;
+	  this.ctx = ctx;
+	  this.cellSize = cellSize;
+	  this.generation = 0;
+	  this.grid = this.populate();
+	};
+	
+	Board.prototype.populate = function(){
+	  var grid = [];
+	  for(var i = 0; i < this.numCells[1]; i++){
+	    grid.push([]);
+	    for(var j = 0; j < this.numCells[0]; j++){
+	    grid[i].push(null);
+	    }
+	  }
+	  return grid;
+	};
+	
+	Board.prototype.buildColony = function(x, y, cellCoord){
+	  debugger;
+	  if(x < this.numCells[1] && y < this.numCells[0]){
+	    if(this.grid[x][y]){
+	      this.grid[x][y] = null;
+	      this.undoSelect(cellCoord);
+	    }
+	    else{
+	    this.grid[x][y] = 1;
+	  }
+	  }
+	};
+	
+	Board.prototype.undoSelect = function(cellCoord){
+	  var ctx = this.ctx;
+	  var cellSize = this.cellSize;
+	  ctx.fillStyle = "grey";
+	  ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
+	};
+	
+	Board.NEIGHBORS = [
+	  [0,-1],[0,1],
+	  [1,0],[-1,0],
+	  [-1,-1],[-1,1],
+	  [1,-1],[1,1]];
+	
+	Board.prototype.step = function(){
+	  this.newGrid = this.populate();
+	  this.newCells = [];
+	  for(var i = 0; i < this.numCells[1]; i++){
+	    for(var j = 0; j < this.numCells[0]; j++){
+	      var aliveNeighbors = 0;
+	
+	      for(var k = 0; k < Board.NEIGHBORS.length; k++){
+	        var delta = Board.NEIGHBORS[k];
+	        var gridVal =
+	          this.grid[i+delta[0]] ? this.grid[i+delta[0]][j+delta[1]] || 0 : 0;
+	        aliveNeighbors += gridVal;
+	      }
+	        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1
+	        // else it lives;
+	
+	        if (this.grid[i][j] === 1){
+	          this.alive = true;
+	          if (aliveNeighbors >= 4 || aliveNeighbors <= 1){
+	            this.newGrid[i][j] = null;
+	            this.newCells.push(new Cell([i,j],'dead'));
+	          }
+	          else{
+	            this.newGrid[i][j] = this.grid[i][j];
+	          }
+	        }
+	        // If cell is dead and it has aliveNeighbors == 3, it becomes alive
+	        else if (!this.grid[i][j] && aliveNeighbors === 3){
+	          this.newGrid[i][j] = 1;
+	          this.newCells.push(new Cell([i,j],'alive'));
+	        }
+	        else{
+	          this.newGrid[i][j] = this.grid[i][j];
+	         }
+	    }//for j
+	  }//for i
+	  this.grid = this.newGrid;
+	  this.generation += 1;
+	  // console.log(this.generation);
+	  this.updateGrid(this.newCells);
+	};//step
+	
+	Board.prototype.updateGrid = function(){
+	  // Iterate through new cells and only update the colours of those cells
+	  var sz = this.cellSize;
+	  for(var i = 0; i < this.newCells.length; i++){
+	    var cell = this.newCells[i];
+	    this.ctx.fillStyle = (cell.state === 'alive') ? '#2D5C8A' : '#bdbdbd';
+	    this.ctx.fillRect(cell.y*sz+1, cell.x*sz+1, sz-2, sz-2);
+	  }
+	};
+	
+	module.exports = Board;
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	var Cell = function(location, state){
+	  this.x = location[0];
+	  this.y = location[1];
+	  this.state = state;
+	};
+	
+	module.exports = Cell;
 
 
 /***/ },
@@ -410,8 +412,8 @@
 	  for(var i = 0; i < data.length; i++){
 	    x = cellCoord[0];
 	    for(var j = 0; j < data[i].length; j++){
-	      if (data[i][j] && x >= 0 && x <= canvasDim.height &&
-	        y >= 0 && y <= canvasDim.width){
+	      if (data[i][j] && x >= 0 && x <= canvasDim.right &&
+	        y >= 0 && y <= canvasDim.bottom){
 	        this.game.drawColony([x,y]);
 	      }
 	      x += this.cellSize;
@@ -419,6 +421,7 @@
 	    y += this.cellSize;
 	  }
 	};
+	
 	Colony.prototype.dragover_handler = function(ev){
 	  ev.preventDefault();
 	};
