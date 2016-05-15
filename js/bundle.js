@@ -324,6 +324,10 @@
 	  this.blinker = [[0, 1, 0], [0, 1, 0], [0, 1, 0]];
 	  this.toad_blinker = [[0, 1, 1, 1],[1, 1, 1, 0]];
 	  this.glider_spaceship = [[0, 0, 1],[1, 0, 1],[0, 1, 1]];
+	  this.pentadecathlon = [
+	    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+	    [1, 1, 0, 1, 1, 1, 1, 0, 1, 1],
+	    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0]];
 	
 	  this.getButtonRefs();
 	  this.addButtonListeners();
@@ -336,6 +340,7 @@
 	  this.osc = document.getElementById("osc");
 	  this.toad = document.getElementById("toad");
 	  this.glider = document.getElementById("glider");
+	  this.penta = document.getElementById("penta");
 	  this.trg = document.getElementById("can-div");
 	};
 	
@@ -345,6 +350,8 @@
 	  this.toad.addEventListener('dragstart',
 	    this.dragstart_handler.bind(this));
 	  this.glider.addEventListener('dragstart',
+	    this.dragstart_handler.bind(this));
+	  this.penta.addEventListener('dragstart',
 	    this.dragstart_handler.bind(this));
 	
 	  this.trg.addEventListener('dragover', this.dragover_handler.bind(this));
@@ -358,6 +365,10 @@
 	  this.glider.addEventListener('dragover', this.dragover_handler.bind(this));
 	  this.glider.addEventListener('dragenter', this.dragover_handler.bind(this));
 	  this.glider.addEventListener('drop', this.ondrop_handler.bind(this));
+	
+	  this.penta.addEventListener('dragover', this.dragover_handler.bind(this));
+	  this.penta.addEventListener('dragenter', this.dragover_handler.bind(this));
+	  this.penta.addEventListener('drop', this.ondrop_handler.bind(this));
 	};
 	
 	Colony.prototype.dragstart_handler = function(ev) {
@@ -389,6 +400,9 @@
 	      break;
 	    case "glider":
 	      data = this.glider_spaceship;
+	      break;
+	    case "penta":
+	      data = this.pentadecathlon;
 	      break;
 	  }
 	  var x = cellCoord[0];

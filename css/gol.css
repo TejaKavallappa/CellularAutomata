@@ -48,7 +48,7 @@ header h1{
   border: 1px solid darkslateblue;
   padding: 5px 20px;
   margin: 0 7px 0 7px;
-  border-radius: 3px;
+  border-radius: 5px;
   background-color: steelblue;
   color: white;
   font-size: 17px;
@@ -117,6 +117,12 @@ header h1{
 #glider{
   background: url(glider.png);
   width: 60px;
+  height: 60px;
+  margin: 10px;
+}
+#penta{
+  background-image: url(pentadecathlon.png);
+  width: 199px;
   height: 60px;
   margin: 10px;
 }
