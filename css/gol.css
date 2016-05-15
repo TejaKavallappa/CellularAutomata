@@ -14,7 +14,7 @@ ul, li, label, input, button {
 }
 body{
   font-family: 'Cinzel', serif;
-  background-image: url(ps_neutral.png); 
+  background-image: url(ps_neutral.png);
 }
 .game{
   display: flex;
@@ -68,9 +68,7 @@ header h1{
 	border-radius:4px;
 	border:1px solid #4b8f29;
 	display:inline-block;
-	cursor:pointer;
 	color:#ffffff;
-	font-family:Arial;
 	font-size:20px;
 	font-weight:bold;
 	padding:6px 12px;
@@ -102,6 +100,7 @@ header h1{
 .patterns{
   display: flex;
   flex-direction: column;
+  width: 300px;
 }
 #osc{
   background: url(blinker.png);

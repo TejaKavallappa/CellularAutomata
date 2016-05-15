@@ -56,22 +56,20 @@
 	
 	  var cellSize = 20;
 	  var ctx = canvasEl.getContext("2d");
-	  var game = new Game(ctx, cellSize);
+	  var board = new Board(26, ctx, cellSize);
+	  var game = new Game(ctx, cellSize, board);
 	  var menu = new MenuBar(game, canvasEl, cellSize, ctx);
-	  var board = new Board(52, ctx, cellSize);
 	  var colony = new Colony(canvasEl, cellSize, game);
-	  board.start();
+	  game.start();
 	});
 
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	var Board = __webpack_require__(2);
-	
-	var Game = function(ctx, cellSize){
-	  this.board = new Board(26, ctx, cellSize);
+	var Game = function(ctx, cellSize, board){
+	  this.board = board;
 	  this.colony = [];
 	  this.ctx = ctx;
 	  this.cellSize = cellSize;
@@ -91,15 +89,15 @@
 	  var bh = Game.DIM_Y;
 	
 	  // Vertical lines
-	  this.ctx.strokeStyle = "black";
+	  this.ctx.strokeStyle = "darkgrey";
 	  this.ctx.lineWidth = 1;
-	  for (var x = 0; x <= bw; x += this.cellSize) {
+	  for (var x = 0; x <= Game.DIM_X; x += this.cellSize) {
 	      this.ctx.moveTo(x, 0);
 	      this.ctx.lineTo(x, bh);
 	      this.ctx.stroke();
 	  }
 	 // Horizontal lines
-	  for (x = 0; x <= bh; x += this.cellSize) {
+	  for (x = 0; x <= Game.DIM_Y; x += this.cellSize) {
 	      this.ctx.moveTo(0, x);
 	      this.ctx.lineTo(bw, x);
 	      this.ctx.stroke();
@@ -112,15 +110,15 @@
 	  this.drawGridLines();
 	};
 	
-	
 	Game.prototype.drawColony = function(cellCoord){
 	  var ctx = this.ctx;
 	  var cellSize = this.cellSize;
 	  // Temporary function to fill a particular cell with color
-	  ctx.fillStyle = "steelblue";
+	  ctx.fillStyle = "#2D5C8A";
 	  ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
 	  // Swap out the hor and vertical coordinates here becuase hor => columns
-	  this.board.buildColony(cellCoord[1]/ cellSize, cellCoord[0]/ cellSize);
+	  this.board.buildColony(cellCoord[1]/ cellSize, cellCoord[0]/ cellSize,
+	    cellCoord);
 	};
 	
 	Game.prototype.step = function(){
@@ -128,7 +126,6 @@
 	};
 	
 	module.exports = Game;
-	window.Game = Game;
 
 
 /***/ },
@@ -137,7 +134,6 @@
 
 	var Cell = __webpack_require__(3);
 	var Board = function(numCells, ctx, cellSize){
-	  // this.colony = [];
 	  this.numCells = numCells;
 	  this.ctx = ctx;
 	  this.cellSize = cellSize;
@@ -159,11 +155,23 @@
 	  return grid;
 	};
 	
-	Board.prototype.buildColony = function(x, y){
-	  // this.colony.push([x,y]);
+	Board.prototype.buildColony = function(x, y, cellCoord){
 	  if(x < this.numCells && y < this.numCells){
+	    if(this.grid[x][y]){
+	      this.grid[x][y] = null;
+	      this.undoSelect(cellCoord);
+	    }
+	    else{
 	    this.grid[x][y] = 1;
 	  }
+	  }
+	};
+	
+	Board.prototype.undoSelect = function(cellCoord){
+	  var ctx = this.ctx;
+	  var cellSize = this.cellSize;
+	  ctx.fillStyle = "grey";
+	  ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
 	};
 	
 	Board.NEIGHBORS = [
@@ -188,6 +196,7 @@
 	        //If cell is alive, it dies if aliveNeighbors > 4 || aliveNeighbors < 1
 	        // else it lives;
 	        if (this.grid[i][j] === 1){
+	          this.alive = true;
 	          if (aliveNeighbors >= 4 || aliveNeighbors <= 1){
 	            this.newGrid[i][j] = null;
 	            this.newCells.push(new Cell([i,j],'dead'));
@@ -208,7 +217,7 @@
 	  }//for i
 	  this.grid = this.newGrid;
 	  this.generation += 1;
-	  // this.draw();
+	  // console.log(this.generation);
 	  this.updateGrid(this.newCells);
 	};//step
 	
@@ -217,57 +226,11 @@
 	  var sz = this.cellSize;
 	  for(var i = 0; i < this.newCells.length; i++){
 	    var cell = this.newCells[i];
-	    this.ctx.fillStyle = (cell.state === 'alive') ? 'steelblue' : 'lightgrey';
+	    this.ctx.fillStyle = (cell.state === 'alive') ? '#2D5C8A' : '#bdbdbd';
 	    this.ctx.fillRect(cell.y*sz+1, cell.x*sz+1, sz-2, sz-2);
 	  }
 	};
 	
-	Board.prototype.draw = function(){
-	  var sz = this.cellSize;
-	  // Clear up the board
-	  this.ctx.clearRect(0, 0, Board.DIM_X, Board.DIM_Y);
-	  this.ctx.fillStyle = 'grey';
-	  this.ctx.fillRect(0, 0, Board.DIM_X, Board.DIM_Y);
-	  // Redraw the board
-	  var self = this;
-	  this.ctx.fillStyle = "yellow";
-	  for(var i = 0; i < this.grid.length; i++){
-	    var row = this.grid[i];
-	    for(var j = 0; j < row.length; j++){
-	      if(this.grid[i][j] === 1){
-	        this.ctx.fillRect(j*sz, i*sz, sz-2, sz-2);
-	      }
-	    }
-	  }
-	this.drawGridLines();
-	};
-	
-	Board.prototype.drawGridLines = function() {
-	  // Draw the grid
-	  //padding around grid
-	  var bw = Board.DIM_X;
-	  var bh = Board.DIM_Y;
-	
-	  // Vertical lines
-	  this.ctx.strokeStyle = "darkgrey";
-	  this.ctx.lineWidth = 1;
-	  for (var x = 0; x <= bw; x += this.cellSize) {
-	      this.ctx.moveTo(x, 0);
-	      this.ctx.lineTo(x, bh);
-	      this.ctx.stroke();
-	  }
-	 // Horizontal lines
-	  for (x = 0; x <= bh; x += this.cellSize) {
-	      this.ctx.moveTo(0, x);
-	      this.ctx.lineTo(bw, x);
-	      this.ctx.stroke();
-	  }
-	  return;
-	};
-	 Board.prototype.start = function () {
-	  this.draw();
-	  this.drawGridLines();
-	};
 	module.exports = Board;
 
 
@@ -300,7 +263,6 @@
 	};
 	MenuBar.prototype.getButtonRefs = function(){
 	  this.startGOL = document.getElementById('start-button');
-	  // this.stopGOL = document.getElementById('stop-button');
 	  this.resetGOL = document.getElementById('reset-button');
 	  this.stepGOL = document.getElementById('step-button');
 	};
@@ -308,12 +270,12 @@
 	MenuBar.prototype.addButtonListeners = function(){
 	  this.canvas.addEventListener('click', this.handleClick.bind(this));
 	  this.startGOL.addEventListener('click', this.startGame.bind(this));
-	  // this.stopGOL.addEventListener('click', this.stopGame.bind(this));
 	  this.resetGOL.addEventListener('click', this.resetGame.bind(this));
 	  this.stepGOL.addEventListener('click', this.stepGame.bind(this));
 	};
 	
 	MenuBar.prototype.startGame = function(){
+	  // Toggle the button value
 	    if (this.startGOL.getAttribute("start") == this.startGOL.innerHTML) {
 	      this.startGOL.innerHTML = this.startGOL.getAttribute("stop");
 	    } else {
@@ -321,17 +283,14 @@
 	      this.startGOL.innerHTML = this.startGOL.getAttribute("start");
 	    }
 	    if (this.runningState === "paused"){
-	      this.runningState = "running";
 	      this.gameRun = setInterval(this.game.step.bind(this.game), 300);
+	      this.runningState = "running";
 	    }
 	    else{
 	        clearInterval(this.gameRun);
 	        this.runningState = "paused";
 	    }
 	};
-	// MenuBar.prototype.stopGame = function(){
-	//   clearInterval(this.gameRun);
-	// };
 	
 	MenuBar.prototype.resetGame = function(){
 	  if (this.gameRun){

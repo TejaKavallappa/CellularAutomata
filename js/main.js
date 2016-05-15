@@ -10,9 +10,9 @@ document.addEventListener("DOMContentLoaded", function(){
 
   var cellSize = 20;
   var ctx = canvasEl.getContext("2d");
-  var game = new Game(ctx, cellSize);
+  var board = new Board(26, ctx, cellSize);
+  var game = new Game(ctx, cellSize, board);
   var menu = new MenuBar(game, canvasEl, cellSize, ctx);
-  var board = new Board(52, ctx, cellSize);
   var colony = new Colony(canvasEl, cellSize, game);
-  board.start();
+  game.start();
 });
