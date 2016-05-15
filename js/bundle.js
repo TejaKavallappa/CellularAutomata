@@ -58,7 +58,7 @@
 	  var ctx = canvasEl.getContext("2d");
 	  var game = new Game(ctx, cellSize);
 	  var menu = new MenuBar(game, canvasEl, cellSize, ctx);
-	  var board = new Board(26, ctx, cellSize);
+	  var board = new Board(52, ctx, cellSize);
 	  var colony = new Colony(canvasEl, cellSize, game);
 	  board.start();
 	});
@@ -117,13 +117,11 @@
 	  var ctx = this.ctx;
 	  var cellSize = this.cellSize;
 	  // Temporary function to fill a particular cell with color
-	  ctx.fillStyle = "green";
+	  ctx.fillStyle = "steelblue";
 	  ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
 	  // Swap out the hor and vertical coordinates here becuase hor => columns
 	  this.board.buildColony(cellCoord[1]/ cellSize, cellCoord[0]/ cellSize);
 	};
-	
-	Game.prototype.pause = function(){};
 	
 	Game.prototype.step = function(){
 	    this.board.step();
@@ -219,7 +217,7 @@
 	  var sz = this.cellSize;
 	  for(var i = 0; i < this.newCells.length; i++){
 	    var cell = this.newCells[i];
-	    this.ctx.fillStyle = (cell.state === 'alive') ? 'yellow' : 'lightgrey';
+	    this.ctx.fillStyle = (cell.state === 'alive') ? 'steelblue' : 'lightgrey';
 	    this.ctx.fillRect(cell.y*sz+1, cell.x*sz+1, sz-2, sz-2);
 	  }
 	};
@@ -251,7 +249,7 @@
 	  var bh = Board.DIM_Y;
 	
 	  // Vertical lines
-	  this.ctx.strokeStyle = "black";
+	  this.ctx.strokeStyle = "darkgrey";
 	  this.ctx.lineWidth = 1;
 	  for (var x = 0; x <= bw; x += this.cellSize) {
 	      this.ctx.moveTo(x, 0);
@@ -296,12 +294,13 @@
 	  this.canvas = canvasEl;
 	  this.cellSize = cellSize;
 	  this.ctx = ctx;
+	  this.runningState = "paused";
 	  this.getButtonRefs();
 	  this.addButtonListeners();
 	};
 	MenuBar.prototype.getButtonRefs = function(){
 	  this.startGOL = document.getElementById('start-button');
-	  this.stopGOL = document.getElementById('stop-button');
+	  // this.stopGOL = document.getElementById('stop-button');
 	  this.resetGOL = document.getElementById('reset-button');
 	  this.stepGOL = document.getElementById('step-button');
 	};
@@ -309,17 +308,30 @@
 	MenuBar.prototype.addButtonListeners = function(){
 	  this.canvas.addEventListener('click', this.handleClick.bind(this));
 	  this.startGOL.addEventListener('click', this.startGame.bind(this));
-	  this.stopGOL.addEventListener('click', this.stopGame.bind(this));
+	  // this.stopGOL.addEventListener('click', this.stopGame.bind(this));
 	  this.resetGOL.addEventListener('click', this.resetGame.bind(this));
 	  this.stepGOL.addEventListener('click', this.stepGame.bind(this));
 	};
 	
 	MenuBar.prototype.startGame = function(){
-	    this.gameRun = setInterval(this.game.step.bind(this.game), 300);
+	    if (this.startGOL.getAttribute("start") == this.startGOL.innerHTML) {
+	      this.startGOL.innerHTML = this.startGOL.getAttribute("stop");
+	    } else {
+	      this.startGOL.setAttribute("stop", this.startGOL.innerHTML);
+	      this.startGOL.innerHTML = this.startGOL.getAttribute("start");
+	    }
+	    if (this.runningState === "paused"){
+	      this.runningState = "running";
+	      this.gameRun = setInterval(this.game.step.bind(this.game), 300);
+	    }
+	    else{
+	        clearInterval(this.gameRun);
+	        this.runningState = "paused";
+	    }
 	};
-	MenuBar.prototype.stopGame = function(){
-	  clearInterval(this.gameRun);
-	};
+	// MenuBar.prototype.stopGame = function(){
+	//   clearInterval(this.gameRun);
+	// };
 	
 	MenuBar.prototype.resetGame = function(){
 	  if (this.gameRun){

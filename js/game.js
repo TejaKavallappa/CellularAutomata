@@ -47,13 +47,11 @@ Game.prototype.drawColony = function(cellCoord){
   var ctx = this.ctx;
   var cellSize = this.cellSize;
   // Temporary function to fill a particular cell with color
-  ctx.fillStyle = "green";
+  ctx.fillStyle = "steelblue";
   ctx.fillRect(cellCoord[0]+1, cellCoord[1]+1, cellSize-2, cellSize-2);
   // Swap out the hor and vertical coordinates here becuase hor => columns
   this.board.buildColony(cellCoord[1]/ cellSize, cellCoord[0]/ cellSize);
 };
-
-Game.prototype.pause = function(){};
 
 Game.prototype.step = function(){
     this.board.step();
