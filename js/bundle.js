@@ -55,9 +55,9 @@
 	  window.HEIGHT = 520;
 	  canvasEl.width = window.WIDTH;
 	  canvasEl.height = window.HEIGHT;
-	  var cellSize = 20;
+	  var cellSize = 10;
 	  var ctx = canvasEl.getContext("2d");
-	  
+	
 	  var board = new Board([canvasEl.width/ cellSize, canvasEl.height/ cellSize],
 	     ctx, cellSize);
 	  var game = new Game(ctx, cellSize, board);
@@ -225,7 +225,6 @@
 	};
 	
 	Board.prototype.buildColony = function(x, y, cellCoord){
-	  debugger;
 	  if(x < this.numCells[1] && y < this.numCells[0]){
 	    if(this.grid[x][y]){
 	      this.grid[x][y] = null;

@@ -13,7 +13,8 @@ ul, li, label, input, button {
   background: transparent;
 }
 body{
-  font-family: 'Cinzel', serif;
+  /*font-family: 'Cinzel', serif;*/
+  font-family: 'Catamaran', serif;
   background-image: url(ps_neutral.png);
 }
 .game{
@@ -73,6 +74,9 @@ header h1{
   flex-direction: column;
   width: 300px;
 }
+.patterns p{
+  text-align: center;
+}
 #osc{
   background: url(blinker.png);
   width: 60px;
@@ -96,4 +100,32 @@ header h1{
   width: 199px;
   height: 60px;
   margin: 10px;
+}
+footer {
+    bottom: 0;
+    height: 40px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    background-color: white;
+}
+footer address{
+  position: absolute;
+  height: 28px;
+  z-index: 100;
+  right: 5px;
+  top: 6px;
+  margin-right: 65px;
+  font-style: normal;
+}
+.github-icon{
+  background-image: url(GitHub-Mark-32px.png);
+  background-repeat: no-repeat;
+  width: 34px;
+  position: absolute;
+  height: 28px;
+  z-index: 100;
+  right: 5px;
+  top: 2px;
+  margin-right: 20px;
 }

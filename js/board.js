@@ -19,7 +19,6 @@ Board.prototype.populate = function(){
 };
 
 Board.prototype.buildColony = function(x, y, cellCoord){
-  debugger;
   if(x < this.numCells[1] && y < this.numCells[0]){
     if(this.grid[x][y]){
       this.grid[x][y] = null;
