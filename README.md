@@ -9,9 +9,9 @@ Explore at [http://tejakavallappa.github.io/CellularAutomata/][live]
 
 ## Welcome View:
 
-[![home-page](./images/landing_page.png)](http://tejakavallappa.github.io/CellularAutomata/)
+[![home-page](./images/landing_page1.png)](http://tejakavallappa.github.io/CellularAutomata/)
 
-[home-page]: (./images/landing_page.png)
+[home-page]: (./images/landing_page1.png)
 
 ## Running pattern:
 
