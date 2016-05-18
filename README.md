@@ -15,9 +15,9 @@ Explore at [http://tejakavallappa.github.io/CellularAutomata/][live]
 
 ## Running pattern:
 
-![landing-page](./images/running.png)
+![landing-page](./images/running_penta.gif)
 
-[landing-page]: /images/running.png
+[landing-page]: /images/running_penta.gif
 
 ## Technical Details:
 

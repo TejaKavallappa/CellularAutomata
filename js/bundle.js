@@ -55,7 +55,7 @@
 	  window.HEIGHT = 520;
 	  canvasEl.width = window.WIDTH;
 	  canvasEl.height = window.HEIGHT;
-	  var cellSize = 10;
+	  var cellSize = 20;
 	  var ctx = canvasEl.getContext("2d");
 	
 	  var board = new Board([canvasEl.width/ cellSize, canvasEl.height/ cellSize],
